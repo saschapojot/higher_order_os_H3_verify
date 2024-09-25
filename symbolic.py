@@ -1,5 +1,5 @@
 from sympy import *
-import sympy as sp
+
 
 
 g0,omegam,omegac,omegap,lmd,theta,tau,Deltam=symbols("g0,omega_m,omega_c,omega_p,lambda,theta,tau,Delta_m",cls=Symbol,positive=True)
@@ -89,55 +89,50 @@ c_exp_cos_tau0=I*g0*sqrt(2*omegam)*poly_x1*(s2+g0*sqrt(2/omegam)*poly_x1*omegap/
 #c1 with tau=0
 c1_x1_s2_tau0=c_cos_2omegap_tau0+c_exp_cos_tau0+c_2exp_tau0
 
-z=exp(-c1_x1_s2_tau0)*exp(c1)
+# z=exp(-c1_x1_s2_tau0)*exp(c1)
 
-lhs=diff(z,tau)
-rhs=c0*z
-
-tmp=lhs-rhs
-# val=tmp.subs([(tau,2),(s2,10),(omegap,3),(omegam,2),(omegac,600),(lmd,2),(g0,10),(theta,12),(Deltam,6),(x1,0.1)])
+# lhs=diff(z,tau)
+# rhs=c0*z
+#
+# tmp=lhs-rhs
+# val=tmp.subs([(tau,0.1),(s2,10),(omegap,3),(omegam,2),(omegac,6004),(lmd,2),(g0,10),(theta,12),(Deltam,6),(x1,0.1)])
 # pprint(val.evalf())
-pprint(tmp.simplify())
+# pprint(tmp.simplify())
+
+# tmp_func=lambdify((g0,omegam,omegac,omegap,lmd,theta,tau,Deltam,x1,s2),tmp,"numpy")
+
+# valsVec=[20,10,3,2,600,2,10,12,6,0.1]
+# print(tmp_func(2,10,3,2,6,2,10,1,6,0.1))
 # end: x2 is a function of s2
 #################################################
 
 ##################################################
 
-# x2=symbols("x2",cls=Symbol,real=True)
-#
-# s2_in_x2=x2*exp(lmd*sin(theta)*tau)\
-#     -g0*sqrt(2/omegam)*(omegac*x1**2-half)*(lmd*sin(theta)*sin(omegap*tau)-omegap*cos(omegap*tau))/(lmd**2*sin(theta)**2+omegap**2)*exp(lmd*sin(theta)*tau)\
-#     -g0*sqrt(2/omegam)*(omegac*x1**2-half)*omegap/(lmd**2*sin(theta)**2+omegap**2)
-#
-#
-# c1_in_x2=c1.subs([(s2,s2_in_x2)])
-#
-#
-# c1_tau0_in_x2=I*g0**2*lmd*sin(theta)/(2*omegap)\
-#     *(lmd**2*sin(theta)**2+omegap**2-lmd*omegap*cos(theta)-omegap*Deltam)\
-#     /(lmd**2*sin(theta)**2+omegap**2)**2*(omegac*x1**2-half)\
-#     +I*g0*sqrt(2*omegam)*(omegac*x1**2-half)\
-#     *(x2*exp(lmd*sin(theta)*tau)-g0*sqrt(2/omegam)*(omegac*x1**2-half)*(lmd*sin(theta)*sin(omegap*tau)-omegap*cos(omegap*tau))/(lmd**2*sin(theta)**2+omegap**2)*exp(lmd*sin(theta)*tau))\
-#     *lmd*sin(theta)/(lmd**2*sin(theta)**2+omegap**2)\
-#     +I*omegam/(4*lmd*sin(theta))*(lmd*cos(theta)+Deltam)\
-#     *(x2*exp(lmd*sin(theta)*tau)-g0*sqrt(2/omegam)*(omegac*x1**2-half)*(lmd*sin(theta)*sin(omegap*tau)-omegap*cos(omegap*tau))/(lmd**2*sin(theta)**2+omegap**2)*exp(lmd*sin(theta)*tau))**2
+X2=symbols("X2",cls=Symbol,real=True)
 
-# z=exp(-c1_tau0_in_x2)*exp(c1_in_x2)
-#
-# tmp=c1.subs([(tau,0)])-c1_tau0
-#
-# pprint(tmp.simplify())
-#
-#
-# c0_in_x2=c0.subs([(s2,s2_in_x2)])
-#
-#
-# d0=g0*omegac*sqrt(2/omegam)*sin(omegap*tau)*x1**2-half*g0*sqrt(2/omegam)*sin(omegap*tau)-lmd*sin(theta)*x2
+s2_in_X2=X2*exp(lmd*sin(theta)*tau)\
+    -g0*sqrt(2/omegam)*(omegac*x1**2-half)*(lmd*sin(theta)*sin(omegap*tau)-omegap*cos(omegap*tau))/(lmd**2*sin(theta)**2+omegap**2)*exp(lmd*sin(theta)*tau)\
+    -g0*sqrt(2/omegam)*(omegac*x1**2-half)*omegap/(lmd**2*sin(theta)**2+omegap**2)
 
-# lhs=diff(z,tau)+d0*diff(z,x2)
-#
-# rhs=c0_in_x2*z
-#
-# tmp=lhs-rhs
-#
-# pprint(simplify(tmp.expand()))
+
+c1_in_X2=c1.subs([(s2,s2_in_X2)])
+
+
+c1_tau0_in_X2=c1_x1_s2_tau0.subs([(s2,s2_in_X2)])
+z=exp(-c1_tau0_in_X2)*exp(c1_in_X2)
+
+
+c0_in_X2=c0.subs([(x2,X2)])
+# pprint(c0_in_X2)
+
+d0=g0*omegac*sqrt(2/omegam)*sin(omegap*tau)*x1**2-half*g0*sqrt(2/omegam)*sin(omegap*tau)-lmd*sin(theta)*X2
+
+lhs=diff(z,tau)+d0*diff(z,X2)
+
+rhs=c0_in_X2*z
+
+tmp=lhs-rhs
+
+
+val=tmp.subs([(tau,100),(X2,10),(omegap,3),(omegam,2),(omegac,6004),(lmd,2),(g0,10),(theta,12),(Deltam,6),(x1,0.1)])
+pprint(val.evalf())
