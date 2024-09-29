@@ -1,5 +1,5 @@
 from sympy import *
-
+import sympy as sp
 
 
 g0,omegam,omegac,omegap,lmd,theta,tau,Deltam=symbols("g0,omega_m,omega_c,omega_p,lambda,theta,tau,Delta_m",cls=Symbol,positive=True)
@@ -119,20 +119,93 @@ c1_in_X2=c1.subs([(s2,s2_in_X2)])
 
 
 c1_tau0_in_X2=c1_x1_s2_tau0.subs([(s2,s2_in_X2)])
-z=exp(-c1_tau0_in_X2)*exp(c1_in_X2)
 
 
-c0_in_X2=c0.subs([(x2,X2)])
-# pprint(c0_in_X2)
+c_tau_in_X2=c_tau.subs([(s2,s2_in_X2)])
+c_cos_2omegap_in_X2=c_cos_2omegap.subs([(s2,s2_in_X2)])
+c_sin_2omegap_in_X2=c_sin_2omegap.subs([(s2,s2_in_X2)])
+c_exp_cos_in_X2=c_exp_cos.subs([(s2,s2_in_X2)])
+c_exp_sin_X2=c_exp_sin.subs([(s2,s2_in_X2)])
+c_exp2tau_in_X2=c_exp2tau.subs([(s2,s2_in_X2)])
 
-d0=g0*omegac*sqrt(2/omegam)*sin(omegap*tau)*x1**2-half*g0*sqrt(2/omegam)*sin(omegap*tau)-lmd*sin(theta)*X2
+rho_x1=omegac*x1**2-half
+D=lmd**2*sin(theta)**2+omegap**2
+mu=lmd*cos(theta)+Deltam
 
-lhs=diff(z,tau)+d0*diff(z,X2)
-
-rhs=c0_in_X2*z
-
-tmp=lhs-rhs
+c_tau_short=I*(quarter*omegac+half*Deltam-half*omegac*rho_x1+(2*omegap-mu)/(2*D)*g0**2*rho_x1**2)*tau+half*lmd*sin(theta)*tau
 
 
-val=tmp.subs([(tau,100),(X2,10),(omegap,3),(omegam,2),(omegac,6004),(lmd,2),(g0,10),(theta,12),(Deltam,6),(x1,0.1)])
+c_cos_2omegap_short=I*half*g0**2*lmd*sin(theta)*(D-mu*omegap)/(omegap*D**2)*rho_x1**2*cos(2*omegap*tau)
+
+c_sin_2omegap_short=I*g0**2*(2*omegap*D+mu*(lmd**2*sin(theta)**2-omegap**2))/(4*omegap*D**2)*rho_x1**2*sin(2*omegap*tau)
+
+c_exp_cos_short=I*g0*sqrt(2*omegam)*lmd*sin(theta)/D*rho_x1*X2*cos(omegap*tau)\
+               - I*g0**2*lmd*sin(theta)/D**2*rho_x1**2*(lmd*sin(theta)*sin(2*omegap*tau)-omegap*cos(2*omegap*tau)-omegap)
+
+
+c_exp_sin_short=I*g0*sqrt(2*omegam)*(mu-omegap)/D*rho_x1*X2*sin(omegap*tau)\
+               - I*g0**2*(mu-omegap)/D**2*rho_x1**2*(lmd*sin(theta)-lmd*sin(theta)*cos(2*omegap*tau)-omegap*sin(2*omegap*tau))
+
+c_exp2tau_short=I*omegam*mu/(4*lmd*sin(theta))*(X2-g0*sqrt(2/omegam)*rho_x1*(lmd*sin(theta)*sin(omegap*tau)-omegap*cos(omegap*tau))/D)**2
+
+
+c_short=c_tau_short+c_cos_2omegap_short+c_sin_2omegap_short+c_exp_cos_short+c_exp_sin_short+c_exp2tau_short
+
+# c_exp2tau_short_expand=I*omegam*mu/(4*lmd*sin(theta))*X2**2\
+#               - I*omegam*mu*g0/(2*lmd*sin(theta))*sqrt(2/omegam)*rho_x1*X2*(lmd*sin(theta)*sin(omegap*tau)-omegap*cos(omegap*tau))/D\
+#               + I*mu*g0**2/(4*lmd*sin(theta))*rho_x1**2*((omegap**2-lmd**2*sin(theta)**2)*cos(2*omegap*tau)-2*lmd*omegap*sin(theta)*sin(2*omegap*tau))/D**2\
+#               +I*mu*g0**2/(4*lmd*D*sin(theta))*rho_x1**2
+# tmp=c_exp2tau_short-c_exp2tau_short_expand
+# pprint(tmp.simplify())
+
+G_tau=(quarter*omegac+half*Deltam-half*omegac*rho_x1+(2*omegap-mu)/(2*D)*g0**2*rho_x1**2)*tau
+
+G_cos_omegap=g0*sqrt(2*omegam)*(2*lmd**2*sin(theta)**2+omegap*mu)/(2*D*lmd*sin(theta))*rho_x1*X2*cos(omegap*tau)
+
+G_sin_omegap=g0*sqrt(2*omegam)/D*(half*mu-omegap)*rho_x1*X2*sin(omegap*tau)
+
+G_cos_2omegap=g0**2\
+             * (2*D*lmd**2*sin(theta)**2+lmd**2*mu*omegap*sin(theta)**2+mu*omegap**3)/(4*D**2*lmd*omegap*sin(theta))\
+             * rho_x1**2*cos(2*omegap*tau)
+
+G_sin_2omegap=g0**2*(2*omegap*D+mu*lmd**2*sin(theta)**2-4*omegap*lmd**2*sin(theta)**2+mu*omegap**2-4*omegap**3)/(4*omegap*D**2)\
+             * rho_x1**2*sin(2*omegap*tau)
+
+G_1=g0**2\
+    *(8*lmd**2*omegap*sin(theta)**2-4*lmd**2*mu*sin(theta)**2+D*mu)/(4*lmd*sin(theta)*D**2)\
+    * rho_x1**2\
+    + omegam*mu/(4*lmd*sin(theta))*X2**2
+
+G=G_tau+G_cos_omegap+G_sin_omegap+G_cos_2omegap+G_sin_2omegap+G_1
+
+func=sin(2*omegap*tau)
+
+c_short_expand=expand(c_short)
+
+
+
+
+tmp=c_short_expand-G*I
+val=tmp.subs([(tau,100),(X2,10),(omegap,3),(omegam,20),(omegac,6004),(lmd,2),(g0,10),(theta,12),(Deltam,6),(x1,0.1)])
 pprint(val.evalf())
+##################################
+# verify pde
+# z=exp(-c1_tau0_in_X2)*exp(c1_in_X2)
+#
+#
+# c0_in_X2=c0.subs([(x2,X2)])
+# # pprint(c0_in_X2)
+#
+# d0=g0*omegac*sqrt(2/omegam)*sin(omegap*tau)*x1**2-half*g0*sqrt(2/omegam)*sin(omegap*tau)-lmd*sin(theta)*X2
+#
+# lhs=diff(z,tau)+d0*diff(z,X2)
+#
+# rhs=c0_in_X2*z
+#
+# tmp=lhs-rhs
+#
+#
+# val=tmp.subs([(tau,100),(X2,10),(omegap,3),(omegam,2),(omegac,6004),(lmd,2),(g0,10),(theta,12),(Deltam,6),(x1,0.1)])
+# pprint(val.evalf())
+
+##################################
