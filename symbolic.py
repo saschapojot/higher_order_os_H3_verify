@@ -182,12 +182,27 @@ func=sin(2*omegap*tau)
 
 c_short_expand=expand(c_short)
 
+P1=quarter*omegac+half*Deltam-half*omegac*rho_x1+(2*omegap-mu)/(2*D)*g0**2*rho_x1**2
+
+F2=g0*sqrt(2*omegam)*(2*lmd**2*sin(theta)**2+omegap*mu)/(2*D*lmd*sin(theta))
+
+F3=g0*sqrt(2*omegam)/D*(half*mu-omegap)
+
+F4=g0**2 * (2*D*lmd**2*sin(theta)**2+lmd**2*mu*omegap*sin(theta)**2+mu*omegap**3)/(4*D**2*lmd*omegap*sin(theta))
+
+F5=g0**2*(2*omegap*D+mu*lmd**2*sin(theta)**2-4*omegap*lmd**2*sin(theta)**2+mu*omegap**2-4*omegap**3)/(4*omegap*D**2)
+
+F6=g0**2*(8*lmd**2*omegap*sin(theta)**2-4*lmd**2*mu*sin(theta)**2+D*mu)/(4*lmd*sin(theta)*D**2)
+F7=omegam*mu/(4*lmd*sin(theta))
+
+
+tmp=G_1-F6*rho_x1**2-F7*X2**2
+
+pprint(tmp.simplify())
 
 
 
-tmp=c_short_expand-G*I
-val=tmp.subs([(tau,100),(X2,10),(omegap,3),(omegam,20),(omegac,6004),(lmd,2),(g0,10),(theta,12),(Deltam,6),(x1,0.1)])
-pprint(val.evalf())
+
 ##################################
 # verify pde
 # z=exp(-c1_tau0_in_X2)*exp(c1_in_X2)
