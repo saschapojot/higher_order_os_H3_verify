@@ -80,6 +80,7 @@ poly_x1=(omegac*x1**2-half)
 c_2exp_tau0=I*omegam/(4*lmd*sin(theta))*(lmd*cos(theta)+Deltam)\
     *(s2+g0*sqrt(2/omegam)*poly_x1*omegap/D1)**2
 
+
 c_cos_2omegap_tau0=I*g0**2/(2*omegap)*lmd*sin(theta)\
     *(lmd**2*sin(theta)**2+omegap**2-omegap*lmd*cos(theta)-omegap*Deltam)/D1**2*poly_x1**2
 
@@ -88,6 +89,10 @@ c_exp_cos_tau0=I*g0*sqrt(2*omegam)*poly_x1*(s2+g0*sqrt(2/omegam)*poly_x1*omegap/
 
 #c1 with tau=0
 c1_x1_s2_tau0=c_cos_2omegap_tau0+c_exp_cos_tau0+c_2exp_tau0
+
+
+
+
 
 # z=exp(-c1_x1_s2_tau0)*exp(c1)
 
@@ -196,31 +201,72 @@ F6=g0**2*(8*lmd**2*omegap*sin(theta)**2-4*lmd**2*mu*sin(theta)**2+D*mu)/(4*lmd*s
 F7=omegam*mu/(4*lmd*sin(theta))
 
 
-tmp=G_1-F6*rho_x1**2-F7*X2**2
-
-pprint(tmp.simplify())
 
 
+A=I*P1*tau+I*F2*rho_x1*X2*cos(omegap*tau)+I*F3*rho_x1*X2*sin(omegap*tau)\
+    +I*F4*rho_x1**2*cos(2*omegap*tau)+I*F5*rho_x1**2*sin(2*omegap*tau)+I*F6*rho_x1**2+I*F7*X2**2\
+    +half*lmd*sin(theta)*tau
+
+
+
+B=I*g0**2*lmd*sin(theta)/(2*omegap)*(D-omegap*mu)/D**2*rho_x1**2\
+    +I*g0*lmd*sin(theta)/D*sqrt(2*omegam)*rho_x1*X2*exp(lmd*sin(theta)*tau)-I*2*g0**2*lmd**2*sin(theta)**2/D**2*rho_x1**2*sin(omegap*tau)*exp(lmd*sin(theta)*tau)\
+    +I*2*g0**2*omegap*lmd*sin(theta)/D**2*rho_x1**2*cos(omegap*tau)*exp(lmd*sin(theta)*tau)\
+    +I*omegam/(4*lmd*sin(theta))*mu*X2**2*exp(2*lmd*sin(theta)*tau)+I*mu*g0**2/(4*lmd*sin(theta)*D)*rho_x1**2*exp(2*lmd*sin(theta)*tau)\
+    -I*mu*g0/(2*D)*sqrt(2*omegam)*rho_x1*X2*sin(omegap*tau)*exp(2*lmd*sin(theta)*tau)\
+    +I*mu*g0*omegap/(2*lmd*sin(theta)*D)*sqrt(2*omegam)*rho_x1*X2*cos(omegap*tau)*exp(2*lmd*sin(theta)*tau)\
+    +I*mu*g0**2/(4*lmd*sin(theta)*D**2)*(omegap**2-lmd**2*sin(theta)**2)*rho_x1**2*cos(2*omegap*tau)*exp(2*lmd*sin(theta)*tau)\
+    -I*mu*omegap*g0**2/(2*D**2)*rho_x1**2*sin(2*omegap*tau)*exp(2*lmd*sin(theta)*tau)
+
+
+R1=g0**2*lmd*sin(theta)/(2*omegap)*(D-omegap*mu)/D**2
+
+R2=g0*lmd*sin(theta)/D*sqrt(2*omegam)
+
+R3=-2*g0**2*lmd**2*sin(theta)**2/D**2
+
+R4=2*g0**2*omegap*lmd*sin(theta)/D**2
+
+R5=omegam/(4*lmd*sin(theta))*mu
+
+R6=mu*g0**2/(4*lmd*sin(theta)*D)
+
+R7=-mu*g0/(2*D)*sqrt(2*omegam)
+
+R8=mu*g0*omegap/(2*lmd*sin(theta)*D)*sqrt(2*omegam)
+
+R9=mu*g0**2/(4*lmd*sin(theta)*D**2)*(omegap**2-lmd**2*sin(theta)**2)
+
+R10=-mu*omegap*g0**2/(2*D**2)
+
+B_subs=I*R1*rho_x1**2\
+    +I*R2*rho_x1*X2*exp(lmd*sin(theta)*tau)+I*R3*rho_x1**2*sin(omegap*tau)*exp(lmd*sin(theta)*tau)\
+    +I*R4*rho_x1**2*cos(omegap*tau)*exp(lmd*sin(theta)*tau)\
+    +I*(R5*X2**2+R6*rho_x1**2)*exp(2*lmd*sin(theta)*tau)\
+    +I*R7*rho_x1*X2*sin(omegap*tau)*exp(2*lmd*sin(theta)*tau)\
+    +I*R8*rho_x1*X2*cos(omegap*tau)*exp(2*lmd*sin(theta)*tau)\
+    +I*R9*rho_x1**2*cos(2*omegap*tau)*exp(2*lmd*sin(theta)*tau)\
+    +I* R10*rho_x1**2*sin(2*omegap*tau)*exp(2*lmd*sin(theta)*tau)
 
 
 ##################################
 # verify pde
-# z=exp(-c1_tau0_in_X2)*exp(c1_in_X2)
-#
-#
-# c0_in_X2=c0.subs([(x2,X2)])
-# # pprint(c0_in_X2)
-#
-# d0=g0*omegac*sqrt(2/omegam)*sin(omegap*tau)*x1**2-half*g0*sqrt(2/omegam)*sin(omegap*tau)-lmd*sin(theta)*X2
-#
-# lhs=diff(z,tau)+d0*diff(z,X2)
-#
-# rhs=c0_in_X2*z
-#
-# tmp=lhs-rhs
-#
-#
-# val=tmp.subs([(tau,100),(X2,10),(omegap,3),(omegam,2),(omegac,6004),(lmd,2),(g0,10),(theta,12),(Deltam,6),(x1,0.1)])
-# pprint(val.evalf())
+z=exp(-B_subs)*exp(A)
 
+
+c0_in_X2=c0.subs([(x2,X2)])
+# pprint(c0_in_X2)
+
+d0=g0*omegac*sqrt(2/omegam)*sin(omegap*tau)*x1**2-half*g0*sqrt(2/omegam)*sin(omegap*tau)-lmd*sin(theta)*X2
+
+lhs=diff(z,tau)+d0*diff(z,X2)
+
+rhs=c0_in_X2*z
+
+tmp=lhs-rhs
+
+
+val=tmp.subs([(tau,100),(X2,10),(omegap,30),(omegam,2),(omegac,6004),(lmd,2),(g0,10),(theta,12),(Deltam,6),(x1,0.1)])
+pprint(val.evalf())
+#
 ##################################
